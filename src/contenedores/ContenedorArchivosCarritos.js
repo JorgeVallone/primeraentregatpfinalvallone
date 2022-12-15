@@ -1,6 +1,6 @@
 const { promises: fs } = require('fs')
 
-class ContenedorArchivo {
+class ContenedorArchivosCarritos {
 
     constructor(path) {
         this.path = path;
@@ -14,7 +14,7 @@ class ContenedorArchivo {
 
             if(!element){
                 return null;
-            } return element;
+            } return element.products;
         } catch (error) {
             console.log(error);
         }
@@ -29,7 +29,7 @@ class ContenedorArchivo {
         }
     }
 
-    async guardar(element) {
+    async newCart(element) {
         try {
             const read = await fs.readFile(this.path, 'utf-8');
             const data = JSON.parse(read);
@@ -42,7 +42,7 @@ class ContenedorArchivo {
 
             await fs.writeFile(this.path, JSON.stringify(data, null, 2), 'utf-8');
 
-            return newElement;
+            return id;
         } catch (error) {
             console.log(error);
         }
@@ -53,13 +53,15 @@ class ContenedorArchivo {
             const read = await fs.readFile(this.path, 'utf-8');
             let data = JSON.parse(read);
 
-            const filteredElements = data.filter((element) => element.id !== id);
-            const newElement = { id, ...element };
-            data = [...filteredElements, newElement];
+            let cart = data.find(element => id === element.id);
+            cart.products.push(element);
+
+            const filteredElements = data.filter(element => element.id !== id);
+            data = [...filteredElements, cart];
                 
             await fs.writeFile(this.path, JSON.stringify(data, null, 2), 'utf-8');
 
-            return newElement;
+            return cart.products;
         } catch (error) {
             console.log(error);
         } 
@@ -79,6 +81,26 @@ class ContenedorArchivo {
         }
     }
 
+    async borrarProducto(idCart, idProduct) {
+        try {
+            const read = await fs.readFile(this.path, 'utf-8');
+            let data = JSON.parse(read);
+
+            let cart = data.find(element => idCart === element.id);
+            const newProducts = cart.products.filter(element => element.id != idProduct);
+            cart.products = newProducts;
+
+            const filteredElements = data.filter(element => element.id !== idCart);
+            data = [...filteredElements, cart];
+
+            await fs.writeFile(this.path, JSON.stringify(data, null, 2), 'utf-8');
+
+            return cart;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async borrarAll() {
         try {
             await fs.writeFile(this.path, JSON.stringify([], null, 2), 'utf-8');
@@ -89,4 +111,4 @@ class ContenedorArchivo {
     }
 }
 
-module.exports = ContenedorArchivo;
+module.exports = ContenedorArchivosCarritos;

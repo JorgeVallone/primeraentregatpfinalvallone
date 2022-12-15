@@ -1,12 +1,10 @@
 const express = require('express')
 
-
 const { Router } = express;
 const carritosRouter = new Router();
 
-
 // importamos la clase Container
-const ContenedorArchivo = require('../contenedores/ContenedorArchivoCarritos')
+const ContenedorArchivosCarritos = require('../contenedores/ContenedorArchivosCarritos');
 const ContenedorArchivo = require('../contenedores/ContenedorArchivo');
 
 // Se instancia la clase contenedor
@@ -36,6 +34,5 @@ carritosRouter.post('/:idCart/:idProduct/products', async (req, res) => {
 carritosRouter.delete('/:idCart/:idProduct/products', async (req, res) => {
     res.json(await CartService.borrarProducto(parseInt(req.params.idCart), parseInt(req.params.idCart)));
 })
-
 
 module.exports = carritosRouter
